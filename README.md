@@ -15,7 +15,7 @@ The documentation includes information such as:
 Sample run:
 
 ```
-./cartridgemapper                                                                                     10059  10:24
+$ ./cartridgemapper
 Endeca cartridge mapper maps the Endeca application cartridge usage.
 This is very useful in understanding how cartridges are used and which cartridges
 are available. One would use this tool to point to a given Endeca application and
