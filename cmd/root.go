@@ -15,6 +15,7 @@ var cfgFile string
 // Verbose sets the verbosity of the application
 var Verbose bool
 
+// AppVersion is the application version
 var AppVersion = "1.0.0"
 
 // rootCmd represents the base command when called without any subcommands

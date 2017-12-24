@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/johnroach/cartridgemapper/cmd"
+import "github.com/JohnRoach/cartridgemapper/cmd"
 
 func main() {
 	cmd.Execute()
