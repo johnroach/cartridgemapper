@@ -9,11 +9,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-// AppVersion is the application version
-var AppVersion = "1.0.0"
-
 // cfgFile is the config file path
 var cfgFile string
+
+// AppVersion is the application version
+var AppVersion = "1.0.0"
 
 // Debug allows printing of bunch of DEBUG values in log
 var Debug bool
