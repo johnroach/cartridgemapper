@@ -1,6 +1,10 @@
 # ignore built binaries
 cartridgemapper
 
+# ignore test archives
+*.zip
+.remove_me
+
 
 # Created by https://www.gitignore.io/api/go,intellij,sublimetext
 
