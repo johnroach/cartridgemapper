@@ -9,14 +9,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+// AppVersion is the application version
+var AppVersion = "1.0.0"
+
 // cfgFile is the config file path
 var cfgFile string
 
-// Verbose sets the verbosity of the application
-var Verbose bool
+// Debug allows printing of bunch of DEBUG values in log
+var Debug bool
 
-// AppVersion is the application version
-var AppVersion = "1.0.0"
+// DisableColor disables the color for a given run
+var DisableColor bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -51,8 +54,8 @@ func init() {
 
 	// Persistent flags. Flags that will live for all subcommands.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cartridgemapper.yaml)")
-	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
-
+	rootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "", false, "adding debug to the logging")
+	rootCmd.PersistentFlags().BoolVarP(&DisableColor, "disable-color", "", false, "disable color for logging output")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -92,5 +95,8 @@ var versionCmd = &cobra.Command{
 
 // printVersion prints out version which is defined globally
 func printVersion() string {
+	if Debug {
+		fmt.Println("Getting the app version")
+	}
 	return AppVersion
 }

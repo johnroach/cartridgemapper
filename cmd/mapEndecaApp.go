@@ -1,16 +1,13 @@
 package cmd
 
 import (
-	"archive/zip"
-	"fmt"
-	"github.com/fatih/color"
+	//"fmt"
+	"github.com/JohnRoach/cartridgemapper/utils"
 	"github.com/magiconair/properties"
 	"github.com/spf13/cobra"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // Cartridge is a combination of all relevant data for a cartridge
@@ -38,24 +35,20 @@ For example:
 		var endecaAppPath string = args[0]
 		dirError := os.MkdirAll(".remove_me", os.ModePerm)
 		if dirError == nil {
-			_, error := Unzip(endecaAppPath, ".remove_me")
+			_, error := utils.Unzip(endecaAppPath, ".remove_me")
 			if error == nil {
-				color.Green("Unzipped exported endeca application file...")
+				displayInfo("Unzipped exported endeca application file...")
 
-				cartridges := mapCartridges(".remove_me")
-
-				fmt.Println(cartridges)
-
-				//removeDirectory(".remove_me")
-				color.Green("Removed temporary directory...")
+				mapCartridges(".remove_me")
+				//fmt.Println(cartridges)
+				removeDirectory(".remove_me")
+				displayInfo("Removed temporary directory...")
 			} else {
-				color.Red("Couldn't unzip file.")
-				log.Fatal(error)
+				displayError("Couldn't unzip file.", error)
 				os.RemoveAll(".remove_me")
 			}
 		} else {
-			color.Red("Couldn't create test directory.")
-			log.Fatal(dirError)
+			displayError("Couldn't create test directory.", dirError)
 		}
 	},
 }
@@ -81,27 +74,41 @@ func mapCartridges(basePath string) []Cartridge {
 
 	for _, cartridge := range cartridgeList {
 		// Should be getting descriptions from XML first than accordingly from property files
-		var newCartridge = Cartridge{
-			id:          cartridge,
-			description: getDescription(basePath + "/templates/" + cartridge),
+
+		templateID, templateDescription, err := getTemplateData(cartridge)
+		if err != nil {
+			displayError("Couldn't read cartridge "+cartridge, err)
+		} else {
+			var newCartridge = Cartridge{
+				id:          templateID,
+				description: templateDescription,
+			}
+			cartridges = append(cartridges, newCartridge)
 		}
-		cartridges = append(cartridges, newCartridge)
 	}
 
 	return cartridges
 }
 
-func getDescription(path string) string {
+func getTemplateData(templateName string) (string, string, error) {
+	var templateDescription string
+	var templateID string
+	var templateError error
+	displayDebug("Starting work on " + templateName)
+	return templateID, templateDescription, templateError
+}
+
+func getDescriptionFromProperty(path string) string {
 	var description string
 	p, err := properties.LoadFile(path+"/locales/Resources_en.properties", properties.UTF8)
 	if err == nil {
 		description = p.GetString("template.description", "")
 		if description == "" {
-			color.Red("Description doesn't exist for template in " + path)
+			displayError("Description doesn't exist for template in "+path, nil)
 			return "No description specified."
 		}
 	} else {
-		color.Red("locale file for description doesn't exist for template in " + path)
+		displayError("locale file for description doesn't exist for template in "+path, err)
 		return "No description specified."
 	}
 	return description
@@ -124,8 +131,7 @@ func getCartridgePaths(path string) []string {
 				cartridgePaths = append(cartridgePaths, cartridgeName)
 			}
 		} else {
-			color.Red("Couldn't read file stats.")
-			log.Fatal(err)
+			displayError("Couldn't read file stats.", err)
 		}
 	}
 
@@ -135,66 +141,25 @@ func getCartridgePaths(path string) []string {
 func removeDirectory(path string) error {
 	removeError := os.RemoveAll(".remove_me")
 	if removeError != nil {
-		color.Red("Couldn't remove .remove_me temp folder.")
+		displayError("Couldn't remove .remove_me temp folder.", removeError)
 	}
 	return removeError
 }
 
-// Unzip will un-compress a zip archive,
-// moving all files and folders to an output directory
-func Unzip(src, dest string) ([]string, error) {
-
-	var filenames []string
-
-	r, err := zip.OpenReader(src)
+func displayError(message string, err error) {
+	var errorMessage string
 	if err != nil {
-		return filenames, err
+		errorMessage = err.Error()
 	}
-	defer r.Close()
+	utils.LogError(message+" "+errorMessage, DisableColor)
+}
 
-	for _, f := range r.File {
-
-		rc, err := f.Open()
-		if err != nil {
-			return filenames, err
-		}
-		defer rc.Close()
-
-		// Store filename/path for returning and using later on
-		fpath := filepath.Join(dest, f.Name)
-		filenames = append(filenames, fpath)
-
-		if f.FileInfo().IsDir() {
-
-			// Make Folder
-			os.MkdirAll(fpath, os.ModePerm)
-
-		} else {
-
-			// Make File
-			var fdir string
-			if lastIndex := strings.LastIndex(fpath, string(os.PathSeparator)); lastIndex > -1 {
-				fdir = fpath[:lastIndex]
-			}
-
-			err = os.MkdirAll(fdir, os.ModePerm)
-			if err != nil {
-				log.Fatal(err)
-				return filenames, err
-			}
-			f, err := os.OpenFile(
-				fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-			if err != nil {
-				return filenames, err
-			}
-			defer f.Close()
-
-			_, err = io.Copy(f, rc)
-			if err != nil {
-				return filenames, err
-			}
-
-		}
+func displayDebug(message string) {
+	if Debug {
+		utils.LogDebug(message, DisableColor)
 	}
-	return filenames, nil
+}
+
+func displayInfo(message string) {
+	utils.LogInfo(message, DisableColor)
 }
