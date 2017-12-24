@@ -1,10 +1,13 @@
 package endeca
 
 import (
+	"encoding/xml"
 	"github.com/JohnRoach/cartridgemapper/utils"
 	"github.com/magiconair/properties"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Cartridge is a combination of all relevant data for a cartridge
@@ -23,6 +26,12 @@ type Cartridge struct {
 	rules []string
 }
 
+// ContentTemplate is a cartridge definition defined in a template
+type ContentTemplate struct {
+	ID          string `xml:"id,attr"`
+	Description string `xml:"Description"`
+}
+
 func MapCartridges(basePath string, DisableColor bool, Debug bool) []Cartridge {
 	var cartridges []Cartridge
 
@@ -31,7 +40,7 @@ func MapCartridges(basePath string, DisableColor bool, Debug bool) []Cartridge {
 	for _, cartridge := range cartridgeList {
 		// Should be getting descriptions from XML first than accordingly from property files
 
-		templateID, templateDescription, err := getTemplateData(cartridge, DisableColor, Debug)
+		templateID, templateDescription, err := getTemplateData(cartridge, basePath+"/templates", DisableColor, Debug)
 		if err != nil {
 			utils.DisplayError("Couldn't read cartridge "+cartridge, err, DisableColor)
 		} else {
@@ -85,10 +94,39 @@ func getCartridgePaths(path string, DisableColor bool, Debug bool) []string {
 	return cartridgePaths
 }
 
-func getTemplateData(templateName string, DisableColor bool, Debug bool) (string, string, error) {
+func getTemplateData(templateName string, basePath string, DisableColor bool, Debug bool) (string, string, error) {
 	var templateDescription string
 	var templateID string
 	var templateError error
 	utils.DisplayDebug("Starting work on "+templateName, Debug, DisableColor)
+
+	xmlFile, err := os.Open(basePath + "/" + templateName + "/template.xml")
+	if err != nil {
+		utils.DisplayError("Error opening file:", err, DisableColor)
+		return templateName, "No description.", err
+	}
+	defer xmlFile.Close()
+
+	b, _ := ioutil.ReadAll(xmlFile)
+
+	var contentTemplate ContentTemplate
+	xml.Unmarshal(b, &contentTemplate)
+
+	if contentTemplate.ID == "" {
+		templateID = templateName
+		utils.LogWarning("Cartridge ID not defined in template. Cartridge name: "+templateName, DisableColor)
+	} else {
+		templateID = contentTemplate.ID
+	}
+
+	if contentTemplate.Description == "${template.description}" {
+		templateDescription = getDescriptionFromProperty(basePath+"/"+templateName, DisableColor, Debug)
+	} else if strings.TrimSpace(contentTemplate.Description) == "" {
+		templateDescription = "No description provided."
+		utils.LogWarning("Cartridge definition not defined in template. Cartridge name: "+templateName, DisableColor)
+	} else {
+		templateDescription = contentTemplate.Description
+	}
+
 	return templateID, templateDescription, templateError
 }

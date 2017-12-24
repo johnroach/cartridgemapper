@@ -34,9 +34,6 @@ For example:
     cartridgemapp mapEndecaApp /full/path/to/endeca/App/lication
     cartridgemapp mapEndecaApp /full/path/to/endeca/App/lication --output json
 `,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute is called by main.main(). It only needs to happen once to the rootCmd.

@@ -28,16 +28,6 @@ For example:
 
 func init() {
 	rootCmd.AddCommand(mapEndecaAppCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// mapEndecaAppCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// mapEndecaAppCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func mapEndecaApp(endecaAppPath string) {
@@ -49,11 +39,11 @@ func mapEndecaApp(endecaAppPath string) {
 
 			endeca.MapCartridges(".remove_me", DisableColor, Debug)
 			//fmt.Println(cartridges)
-			removeDirectory(".remove_me")
+			//removeDirectory(".remove_me")
 			utils.DisplayInfo("Removed temporary directory...", DisableColor)
 		} else {
 			utils.DisplayError("Couldn't unzip file.", error, DisableColor)
-			os.RemoveAll(".remove_me")
+			removeDirectory(".remove_me")
 		}
 	} else {
 		utils.DisplayError("Couldn't create test directory.", dirError, DisableColor)

@@ -29,6 +29,18 @@ func LogInfo(message string, colorDisabled bool) {
 	}
 }
 
+// LogWarning displays warning type output
+func LogWarning(message string, colorDisabled bool) {
+	Info = log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime)
+	if !colorDisabled {
+		color.Set(color.FgYellow)
+	}
+	Info.Println(message)
+	if !colorDisabled {
+		color.Unset()
+	}
+}
+
 // LogDebug displays debug type output
 func LogDebug(message string, colorDisabled bool) {
 	Debug = log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime)
@@ -65,6 +77,10 @@ func DisplayDebug(message string, Debug bool, DisableColor bool) {
 	if Debug {
 		LogDebug(message, DisableColor)
 	}
+}
+
+func DisplayWarning(message string, DisableColor bool) {
+
 }
 
 func DisplayInfo(message string, DisableColor bool) {
