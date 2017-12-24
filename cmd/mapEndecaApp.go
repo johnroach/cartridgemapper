@@ -13,6 +13,7 @@ import (
 	"strings"
 )
 
+// Cartridge is a combination of all relevant data for a cartridge
 type Cartridge struct {
 	path        string
 	description string
