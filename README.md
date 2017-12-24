@@ -9,3 +9,9 @@ The documentation includes information such as:
 - Endeca rules that use cartridge
 - Sites that use cartridge
 - Pages that use said cartridge
+
+Sample run:
+
+```
+cartridgemapper mapEndecaApp /full/path/to/endeca/App/lication
+```
