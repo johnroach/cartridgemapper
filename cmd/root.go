@@ -15,6 +15,8 @@ var cfgFile string
 // Verbose sets the verbosity of the application
 var Verbose bool
 
+var AppVersion = "1.0.0"
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cartridgemapper",
@@ -83,6 +85,11 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version number of cartridgemapper",
 	Long:  `All software has versions. This is cartridgemappers's`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Cartridge mapper v0.0")
+		fmt.Println("Cartridge mapper v" + printVersion())
 	},
+}
+
+// printVersion prints out version which is defined globally
+func printVersion() string {
+	return AppVersion
 }
