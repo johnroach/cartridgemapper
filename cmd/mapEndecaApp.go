@@ -44,7 +44,7 @@ func mapEndecaApp(endecaAppPath string) {
 
 			var cartridges []endeca.Cartridge = endeca.MapCartridges(".remove_me", DisableColor, Debug)
 			cartridgeOutputHTML(cartridges, outputPath, DisableColor, Debug)
-			//removeDirectory(".remove_me")
+			removeDirectory(".remove_me")
 			utils.DisplayInfo("Removed temporary directory...", DisableColor)
 		} else {
 			utils.DisplayError("Couldn't unzip file.", error, DisableColor)
