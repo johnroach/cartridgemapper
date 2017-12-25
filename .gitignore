@@ -4,6 +4,7 @@ cartridgemapper
 # ignore test archives
 *.zip
 .remove_me
+index.html
 
 
 # Created by https://www.gitignore.io/api/go,intellij,sublimetext

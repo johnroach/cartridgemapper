@@ -1,12 +1,15 @@
 package cmd
 
 import (
-	//"fmt"
 	"github.com/JohnRoach/cartridgemapper/endeca"
 	"github.com/JohnRoach/cartridgemapper/utils"
 	"github.com/spf13/cobra"
+	"html/template"
 	"os"
 )
+
+var outputPath string
+var templatePath string
 
 // mapEndecaAppCmd represents the mapEndecaApp command
 var mapEndecaAppCmd = &cobra.Command{
@@ -28,6 +31,8 @@ For example:
 
 func init() {
 	rootCmd.AddCommand(mapEndecaAppCmd)
+	mapEndecaAppCmd.Flags().StringVarP(&outputPath, "outputPath", "o", ".", "Output path for the endeca map")
+	mapEndecaAppCmd.Flags().StringVarP(&templatePath, "templatePath", "", "", "Template path for the endeca map")
 }
 
 func mapEndecaApp(endecaAppPath string) {
@@ -37,8 +42,8 @@ func mapEndecaApp(endecaAppPath string) {
 		if error == nil {
 			utils.DisplayInfo("Unzipped exported endeca application file...", DisableColor)
 
-			endeca.MapCartridges(".remove_me", DisableColor, Debug)
-			//fmt.Println(cartridges)
+			var cartridges []endeca.Cartridge = endeca.MapCartridges(".remove_me", DisableColor, Debug)
+			cartridgeOutputHTML(cartridges, outputPath, DisableColor, Debug)
 			//removeDirectory(".remove_me")
 			utils.DisplayInfo("Removed temporary directory...", DisableColor)
 		} else {
@@ -48,6 +53,28 @@ func mapEndecaApp(endecaAppPath string) {
 	} else {
 		utils.DisplayError("Couldn't create test directory.", dirError, DisableColor)
 	}
+}
+
+func cartridgeOutputHTML(cartridges []endeca.Cartridge, outputPath string, DisableColor bool, Debug bool) {
+	t, parseFileError := template.ParseFiles("all_cartridges.html")
+	if parseFileError != nil {
+		utils.DisplayError("Had a parsefile error", parseFileError, DisableColor)
+		return
+	}
+
+	fo, createOutputError := os.Create(outputPath + "/index.html")
+	if createOutputError != nil {
+		utils.DisplayError("Failed to create output", createOutputError, DisableColor)
+		return
+	}
+
+	templateExecuteError := t.ExecuteTemplate(fo, "all_cartridges.html", cartridges)
+	fo.Close()
+	if templateExecuteError != nil {
+		utils.DisplayError("Had a template execute error", templateExecuteError, DisableColor)
+		return
+	}
+	utils.DisplayInfo("Created index.html file at "+outputPath+"/index.html", DisableColor)
 }
 
 func removeDirectory(path string) error {

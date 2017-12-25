@@ -3,7 +3,6 @@ package endeca
 import (
 	"bytes"
 	"encoding/xml"
-	"fmt"
 	"github.com/JohnRoach/cartridgemapper/utils"
 	"github.com/magiconair/properties"
 	"io/ioutil"
@@ -52,7 +51,7 @@ func MapCartridges(basePath string, DisableColor bool, Debug bool) []Cartridge {
 	cartridgeList := getCartridgePaths(basePath+"/templates", DisableColor, Debug)
 
 	endecaRules = getTemplateEndecaRules(basePath, DisableColor, Debug)
-	fmt.Println(endecaRules)
+
 	for _, cartridge := range cartridgeList {
 		// Should be getting descriptions from XML first than accordingly from property files
 
@@ -60,10 +59,16 @@ func MapCartridges(basePath string, DisableColor bool, Debug bool) []Cartridge {
 		if err != nil {
 			utils.DisplayError("Couldn't read cartridge "+cartridge, err, DisableColor)
 		} else {
-
+			var cartridgeEndecaRules []string
+			for _, endecaRule := range endecaRules {
+				if endecaRule.cartridgeID == cartridge {
+					cartridgeEndecaRules = endecaRule.rules
+				}
+			}
 			var newCartridge = Cartridge{
 				id:          templateID,
 				description: templateDescription,
+				rules:       cartridgeEndecaRules,
 			}
 			cartridges = append(cartridges, newCartridge)
 		}
@@ -213,4 +218,26 @@ func getTemplateData(templateName string, basePath string, DisableColor bool, De
 	}
 
 	return templateID, templateDescription, templateError
+}
+
+// ID returns the ID of the cartridge
+func (f Cartridge) ID() string {
+	return f.id
+}
+
+// Description returns the description of the cartridge
+func (f Cartridge) Description() string {
+	return f.description
+}
+
+func (f Cartridge) Pages() []string {
+	return f.pages
+}
+
+func (f Cartridge) Path() string {
+	return f.path
+}
+
+func (f Cartridge) Rules() []string {
+	return f.rules
 }
