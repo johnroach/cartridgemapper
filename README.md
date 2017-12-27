@@ -12,7 +12,6 @@ The documentation includes information such as:
 - Sites that use cartridge
 - Pages that use said cartridge
 
-
 Sample run:
 
 ```
