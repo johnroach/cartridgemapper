@@ -1,11 +1,12 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/JohnRoach/cartridgemapper/endeca"
+	"github.com/JohnRoach/cartridgemapper/templates"
 	"github.com/JohnRoach/cartridgemapper/utils"
 	"github.com/spf13/cobra"
-	"html/template"
-	"os"
 )
 
 var outputPath string
@@ -42,8 +43,8 @@ func mapEndecaApp(endecaAppPath string) {
 		if error == nil {
 			utils.DisplayInfo("Unzipped exported endeca application file...", DisableColor)
 
-			var cartridges []endeca.Cartridge = endeca.MapCartridges(".remove_me", DisableColor, Debug)
-			cartridgeOutputHTML(cartridges, outputPath, DisableColor, Debug)
+			var cartridges = endeca.MapCartridges(".remove_me", DisableColor, Debug)
+			templates.CartridgeOutputHTML(cartridges, outputPath, DisableColor, Debug)
 			removeDirectory(".remove_me")
 			utils.DisplayInfo("Removed temporary directory...", DisableColor)
 		} else {
@@ -53,28 +54,6 @@ func mapEndecaApp(endecaAppPath string) {
 	} else {
 		utils.DisplayError("Couldn't create test directory.", dirError, DisableColor)
 	}
-}
-
-func cartridgeOutputHTML(cartridges []endeca.Cartridge, outputPath string, DisableColor bool, Debug bool) {
-	t, parseFileError := template.ParseFiles("all_cartridges.html")
-	if parseFileError != nil {
-		utils.DisplayError("Had a parsefile error", parseFileError, DisableColor)
-		return
-	}
-
-	fo, createOutputError := os.Create(outputPath + "/index.html")
-	if createOutputError != nil {
-		utils.DisplayError("Failed to create output", createOutputError, DisableColor)
-		return
-	}
-
-	templateExecuteError := t.ExecuteTemplate(fo, "all_cartridges.html", cartridges)
-	fo.Close()
-	if templateExecuteError != nil {
-		utils.DisplayError("Had a template execute error", templateExecuteError, DisableColor)
-		return
-	}
-	utils.DisplayInfo("Created index.html file at "+outputPath+"/index.html", DisableColor)
 }
 
 func removeDirectory(path string) error {

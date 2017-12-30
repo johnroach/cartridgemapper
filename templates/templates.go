@@ -1,3 +1,10 @@
+package templates
+
+//I haven't been able to find a better way to package templates within the binary
+//if you find a better way please feel free to implement it.
+
+// IndexPage template
+var IndexPage = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -69,3 +76,4 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
   </body>
 </html>
+`
