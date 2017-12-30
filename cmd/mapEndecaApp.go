@@ -45,11 +45,11 @@ func mapEndecaApp(endecaAppPath string) {
 
 			var cartridges = endeca.MapCartridges(".remove_me", DisableColor, Debug)
 			templates.CartridgeOutputHTML(cartridges, outputPath, DisableColor, Debug)
-			removeDirectory(".remove_me")
+			//removeDirectory(".remove_me")
 			utils.DisplayInfo("Removed temporary directory...", DisableColor)
 		} else {
 			utils.DisplayError("Couldn't unzip file.", error, DisableColor)
-			removeDirectory(".remove_me")
+			//removeDirectory(".remove_me")
 		}
 	} else {
 		utils.DisplayError("Couldn't create test directory.", dirError, DisableColor)

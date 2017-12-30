@@ -3,12 +3,13 @@ package endeca
 import (
 	"bytes"
 	"encoding/xml"
-	"github.com/JohnRoach/cartridgemapper/utils"
-	"github.com/magiconair/properties"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/JohnRoach/cartridgemapper/utils"
+	"github.com/magiconair/properties"
 )
 
 // Cartridge is a combination of all relevant data for a cartridge
@@ -70,6 +71,7 @@ func MapCartridges(basePath string, DisableColor bool, Debug bool) []Cartridge {
 				description: templateDescription,
 				rules:       cartridgeEndecaRules,
 			}
+			getCartridgeSitePageUsage(basePath, newCartridge, DisableColor, Debug)
 			cartridges = append(cartridges, newCartridge)
 		}
 	}
@@ -116,9 +118,47 @@ func getCartridgePaths(path string, DisableColor bool, Debug bool) []string {
 	return cartridgePaths
 }
 
+func getCartridgeSitePageUsage(basePath string, cartridge Cartridge, DisableColor bool, Debug bool) Cartridge {
+	var endecaSitePath = basePath + "/pages"
+	utils.DisplayInfo("Starting Endeca template site and page usage scan...", DisableColor)
+	err := filepath.Walk(endecaSitePath, func(path string, f os.FileInfo, walkError error) error {
+		if strings.Contains(path, "content.xml") {
+			xmlFile, xmlErr := os.Open(path)
+			if xmlErr != nil {
+				utils.DisplayError("Couldn't read XML for site and page scan at path "+path, xmlErr, DisableColor)
+			} else {
+				b, _ := ioutil.ReadAll(xmlFile)
+				buf := bytes.NewBuffer(b)
+				dec := xml.NewDecoder(buf)
+				var n SharedContent
+				xmlReadErr := dec.Decode(&n)
+				if xmlReadErr != nil {
+					panic(xmlReadErr)
+				}
+				walk([]SharedContent{n}, func(n SharedContent) bool {
+					if n.XMLName.Local == "TemplateId" {
+						cartridgeName := string(n.ContentItem)
+						if cartridgeName == cartridge.id {
+							utils.DisplayDebug("Found template in "+path, Debug, DisableColor)
+						}
+					}
+					return true
+				})
+			}
+			xmlFile.Close()
+		}
+		return walkError
+	})
+
+	if err != nil {
+		utils.DisplayError("Could not walk through site path", err, DisableColor)
+	}
+	return cartridge
+}
+
 func getTemplateEndecaRules(basePath string, DisableColor bool, Debug bool) []EndecaRules {
 	var endecaRules []EndecaRules
-	var endecaRulesPath string = basePath + "/content"
+	var endecaRulesPath = basePath + "/content"
 	utils.DisplayInfo("Starting Endeca shared content scan.", DisableColor)
 	err := filepath.Walk(endecaRulesPath, func(path string, f os.FileInfo, err error) error {
 		if strings.Contains(path, "content.xml") {
@@ -131,16 +171,16 @@ func getTemplateEndecaRules(basePath string, DisableColor bool, Debug bool) []En
 				buf := bytes.NewBuffer(b)
 				dec := xml.NewDecoder(buf)
 				var n SharedContent
-				err := dec.Decode(&n)
-				if err != nil {
-					panic(err)
+				xmlReadErr := dec.Decode(&n)
+				if xmlReadErr != nil {
+					panic(xmlReadErr)
 				}
 
 				walk([]SharedContent{n}, func(n SharedContent) bool {
 					if n.XMLName.Local == "TemplateId" {
 						cartridgeName := string(n.ContentItem)
 						var found bool
-						var endecaRulePath string = strings.Replace(path, ".remove_me/content/", "", -1)
+						var endecaRulePath = strings.Replace(path, ".remove_me/content/", "", -1)
 						endecaRulePath = strings.Replace(endecaRulePath, "/content.xml", "", -1)
 						for index, endecaRule := range endecaRules {
 							if endecaRule.cartridgeID == cartridgeName {

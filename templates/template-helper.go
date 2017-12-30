@@ -8,6 +8,8 @@ import (
 	"github.com/JohnRoach/cartridgemapper/utils"
 )
 
+//CartridgeOutputHTML receives the cartridges and by using the IndexPage template
+//in templates it produces a cool looking HTML page that can be used.
 func CartridgeOutputHTML(cartridges []endeca.Cartridge, outputPath string, DisableColor bool, Debug bool) {
 	t, parseFileError := template.New("IndexPage").Parse(IndexPage)
 	if parseFileError != nil {
