@@ -28,11 +28,13 @@ type Cartridge struct {
 	rules []string
 }
 
-type EndecaRules struct {
+//Rules is a cartridgeID and rules definition
+type Rules struct {
 	cartridgeID string
 	rules       []string
 }
 
+// SharedContent is a generic struct used for XML walking
 type SharedContent struct {
 	XMLName       xml.Name
 	ContentItem   []byte          `xml:",innerxml"`
@@ -45,13 +47,14 @@ type ContentTemplate struct {
 	Description string `xml:"Description"`
 }
 
+// MapCartridges allows one to map all cartridges and usages for a given base path
 func MapCartridges(basePath string, DisableColor bool, Debug bool) []Cartridge {
 	var cartridges []Cartridge
-	var endecaRules []EndecaRules
+	var endecaRules []Rules
 
 	cartridgeList := getCartridgePaths(basePath+"/templates", DisableColor, Debug)
 
-	endecaRules = getTemplateEndecaRules(basePath, DisableColor, Debug)
+	endecaRules = getTemplateRules(basePath, DisableColor, Debug)
 
 	for _, cartridge := range cartridgeList {
 		// Should be getting descriptions from XML first than accordingly from property files
@@ -60,18 +63,18 @@ func MapCartridges(basePath string, DisableColor bool, Debug bool) []Cartridge {
 		if err != nil {
 			utils.DisplayError("Couldn't read cartridge "+cartridge, err, DisableColor)
 		} else {
-			var cartridgeEndecaRules []string
+			var cartridgeRules []string
 			for _, endecaRule := range endecaRules {
 				if endecaRule.cartridgeID == cartridge {
-					cartridgeEndecaRules = endecaRule.rules
+					cartridgeRules = endecaRule.rules
 				}
 			}
 			var newCartridge = Cartridge{
 				id:          templateID,
 				description: templateDescription,
-				rules:       cartridgeEndecaRules,
+				rules:       cartridgeRules,
 			}
-			getCartridgeSitePageUsage(basePath, newCartridge, DisableColor, Debug)
+			newCartridge = getCartridgeSitePageUsage(basePath, newCartridge, DisableColor, Debug)
 			cartridges = append(cartridges, newCartridge)
 		}
 	}
@@ -120,7 +123,7 @@ func getCartridgePaths(path string, DisableColor bool, Debug bool) []string {
 
 func getCartridgeSitePageUsage(basePath string, cartridge Cartridge, DisableColor bool, Debug bool) Cartridge {
 	var endecaSitePath = basePath + "/pages"
-	utils.DisplayInfo("Starting Endeca template site and page usage scan...", DisableColor)
+	utils.DisplayDebug("Starting Endeca template site and page usage scan for "+cartridge.id, Debug, DisableColor)
 	err := filepath.Walk(endecaSitePath, func(path string, f os.FileInfo, walkError error) error {
 		if strings.Contains(path, "content.xml") {
 			xmlFile, xmlErr := os.Open(path)
@@ -136,11 +139,28 @@ func getCartridgeSitePageUsage(basePath string, cartridge Cartridge, DisableColo
 					panic(xmlReadErr)
 				}
 				walk([]SharedContent{n}, func(n SharedContent) bool {
+					var pathInfo = strings.Split(path, "/")
+					var siteName = pathInfo[2]
+					var pageName = strings.Join(pathInfo[3:len(pathInfo)-1], "/")
+
 					if n.XMLName.Local == "TemplateId" {
 						cartridgeName := string(n.ContentItem)
 						if cartridgeName == cartridge.id {
-							utils.DisplayDebug("Found template in "+path, Debug, DisableColor)
+							utils.DisplayDebug("Found template in "+path+" which means it was in site "+siteName, Debug, DisableColor)
+							cartridge = cartridge.addSite(siteName)
+							cartridge = cartridge.addPage(pageName)
 						}
+					}
+					if n.XMLName.Local == "String" {
+						var stringValue = string(n.ContentItem)
+						var oldCartridgeRules = cartridge.rules
+						for _, oldCartridgeEndecaRule := range oldCartridgeRules {
+							if "/content/"+oldCartridgeEndecaRule == stringValue {
+								cartridge = cartridge.addSite(siteName)
+								cartridge = cartridge.addPage(pageName)
+							}
+						}
+
 					}
 					return true
 				})
@@ -156,8 +176,8 @@ func getCartridgeSitePageUsage(basePath string, cartridge Cartridge, DisableColo
 	return cartridge
 }
 
-func getTemplateEndecaRules(basePath string, DisableColor bool, Debug bool) []EndecaRules {
-	var endecaRules []EndecaRules
+func getTemplateRules(basePath string, DisableColor bool, Debug bool) []Rules {
+	var endecaRules []Rules
 	var endecaRulesPath = basePath + "/content"
 	utils.DisplayInfo("Starting Endeca shared content scan.", DisableColor)
 	err := filepath.Walk(endecaRulesPath, func(path string, f os.FileInfo, err error) error {
@@ -187,7 +207,7 @@ func getTemplateEndecaRules(basePath string, DisableColor bool, Debug bool) []En
 								found = true
 								rulesInEndecaRule := endecaRule.rules
 								rulesInEndecaRule = append(rulesInEndecaRule, endecaRulePath)
-								endecaRules[index] = EndecaRules{
+								endecaRules[index] = Rules{
 									cartridgeID: endecaRule.cartridgeID,
 									rules:       rulesInEndecaRule,
 								}
@@ -195,7 +215,7 @@ func getTemplateEndecaRules(basePath string, DisableColor bool, Debug bool) []En
 						}
 						if !found {
 							var paths []string
-							endecaRules = append(endecaRules, EndecaRules{
+							endecaRules = append(endecaRules, Rules{
 								cartridgeID: cartridgeName,
 								rules:       append(paths, endecaRulePath),
 							})
@@ -260,24 +280,58 @@ func getTemplateData(templateName string, basePath string, DisableColor bool, De
 	return templateID, templateDescription, templateError
 }
 
-// ID returns the ID of the cartridge
-func (f Cartridge) ID() string {
+// GetID returns the ID of the cartridge
+func (f Cartridge) GetID() string {
 	return f.id
 }
 
-// Description returns the description of the cartridge
-func (f Cartridge) Description() string {
+// GetDescription returns the description of the cartridge
+func (f Cartridge) GetDescription() string {
 	return f.description
 }
 
-func (f Cartridge) Pages() []string {
+// GetPages returns the pages for a given cartridge
+func (f Cartridge) GetPages() []string {
 	return f.pages
 }
 
-func (f Cartridge) Path() string {
+// GetSites returns the sites for a given cartridge
+func (f Cartridge) GetSites() []string {
+	return f.sites
+}
+
+// GetPath returns the path for a given cartridge
+func (f Cartridge) GetPath() string {
 	return f.path
 }
 
-func (f Cartridge) Rules() []string {
+// GetRules returns a list of rules for a given cartridge
+func (f Cartridge) GetRules() []string {
 	return f.rules
+}
+
+func (f Cartridge) addPage(page string) Cartridge {
+	var foundPage bool
+	for _, oldCartridgePage := range f.pages {
+		if page == oldCartridgePage {
+			foundPage = true
+		}
+	}
+	if !foundPage {
+		f.pages = append(f.pages, page)
+	}
+	return f
+}
+
+func (f Cartridge) addSite(site string) Cartridge {
+	var foundSite bool
+	for _, oldCartridgeSite := range f.sites {
+		if site == oldCartridgeSite {
+			foundSite = true
+		}
+	}
+	if !foundSite {
+		f.sites = append(f.sites, site)
+	}
+	return f
 }
