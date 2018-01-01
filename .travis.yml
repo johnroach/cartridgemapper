@@ -7,6 +7,7 @@ before_deploy:
 - git config --local user.email "johnroach1985@gmail.com"
 - git tag "$(./cartridgemapper version)-$(date +'%Y%m%d%H%M%S')"
 deploy:
+  skip_cleanup: true
   provider: releases
   api_key:
     secure: Q33o81YUuvOjHzYiCYYcPaAncRHJPtmOyotF5dmiAXwYO24pxSxSYhAdUA54uRv2uF4AqxZrChUt7B23wj0Hg0IVfJxQjE9x+vN1+GcXouXZbpc/m9MomroRrs71EE82NQYU1cwjiaiVQcrEtPcSS7xvBVXsZAb3Yo/g9okSQCXNtVQX90+gM2Oeqoc/0ltImkJjC7xFyZPEDYQV29lEYfpjApLEgKy9lERNIAfRmoe/z3jlgOJg0x09Lau+Q9WUDtAAG7L3HhDxyyFCReEonsrSrrHYdWbAz1K/b9zxHyY3912UL8bBX8y4PqGQDDueSVN587GZDfV760wy+tVgntSZdZ+e2aZaFMiF5ldHckM29VmOMoipyVJL3jP8mk/E+w15TkDqGroww6hUqXp5Y+JrZpPiE4/2bwH5MIUE9H6UwI3iJ8GAB6r1n0xs9R6FI8csMQedzAqYHqUHU31pKpBixwqRyh9SZny446lbfGta1cbkeboWQP/nfpn39dsjtcBwDLnPVk5qwHLUkja3Ye7mjZBGwwAa83jPkn0SkuHE3JTntdEdqVI+rKDYaxO78wdWKqtv0NlCtDJAOt7s7L25SNx0yb+C/VSo3eOhfD5Uy4iGYaIRmInGKL2Va9Ut+m4VrYm06+OK/olM3TBd3Gbi084fIp7RoLIBDE+1Ho4=
