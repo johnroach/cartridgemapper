@@ -263,7 +263,7 @@ func getTemplateData(templateName string, basePath string, DisableColor bool, De
 
 	if contentTemplate.ID == "" {
 		templateID = templateName
-		utils.LogWarning("Cartridge ID not defined in template. Cartridge name: "+templateName, DisableColor)
+		utils.DisplayWarning("Cartridge ID not defined in template. Cartridge name: "+templateName, DisableColor)
 	} else {
 		templateID = contentTemplate.ID
 	}
@@ -272,7 +272,7 @@ func getTemplateData(templateName string, basePath string, DisableColor bool, De
 		templateDescription = getDescriptionFromProperty(basePath+"/"+templateName, DisableColor, Debug)
 	} else if strings.TrimSpace(contentTemplate.Description) == "" {
 		templateDescription = "No description provided."
-		utils.LogWarning("Cartridge definition not defined in template. Cartridge name: "+templateName, DisableColor)
+		utils.DisplayWarning("Cartridge definition not defined in template. Cartridge name: "+templateName, DisableColor)
 	} else {
 		templateDescription = contentTemplate.Description
 	}

@@ -1,9 +1,10 @@
 package utils
 
 import (
-	"github.com/fatih/color"
 	"log"
 	"os"
+
+	"github.com/fatih/color"
 )
 
 var (
@@ -18,7 +19,7 @@ var (
 )
 
 // LogInfo displays info type output
-func LogInfo(message string, colorDisabled bool) {
+func logInfo(message string, colorDisabled bool) {
 	Info = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
 	if !colorDisabled {
 		color.Set(color.FgGreen)
@@ -30,7 +31,7 @@ func LogInfo(message string, colorDisabled bool) {
 }
 
 // LogWarning displays warning type output
-func LogWarning(message string, colorDisabled bool) {
+func logWarning(message string, colorDisabled bool) {
 	Info = log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime)
 	if !colorDisabled {
 		color.Set(color.FgYellow)
@@ -42,7 +43,7 @@ func LogWarning(message string, colorDisabled bool) {
 }
 
 // LogDebug displays debug type output
-func LogDebug(message string, colorDisabled bool) {
+func logDebug(message string, colorDisabled bool) {
 	Debug = log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime)
 	if !colorDisabled {
 		color.Set(color.FgHiBlue)
@@ -54,7 +55,7 @@ func LogDebug(message string, colorDisabled bool) {
 }
 
 // LogError displays error type output
-func LogError(message string, colorDisabled bool) {
+func logError(message string, colorDisabled bool) {
 	Error = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime)
 	if !colorDisabled {
 		color.Set(color.FgRed)
@@ -65,24 +66,28 @@ func LogError(message string, colorDisabled bool) {
 	}
 }
 
+//DisplayError gets the error and the message to show to the user and displays it
 func DisplayError(message string, err error, DisableColor bool) {
 	var errorMessage string
 	if err != nil {
 		errorMessage = err.Error()
 	}
-	LogError(message+" "+errorMessage, DisableColor)
+	logError(message+" "+errorMessage, DisableColor)
 }
 
+//DisplayDebug displays debug messages
 func DisplayDebug(message string, Debug bool, DisableColor bool) {
 	if Debug {
-		LogDebug(message, DisableColor)
+		logDebug(message, DisableColor)
 	}
 }
 
+//DisplayWarning displays warning messages
 func DisplayWarning(message string, DisableColor bool) {
-
+	logWarning(message, DisableColor)
 }
 
+//DisplayInfo displays info messages
 func DisplayInfo(message string, DisableColor bool) {
-	LogInfo(message, DisableColor)
+	logInfo(message, DisableColor)
 }
