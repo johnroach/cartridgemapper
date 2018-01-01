@@ -5,7 +5,7 @@ skip_cleanup: true
 before_deploy:
 - git config --local user.name "John Roach"
 - git config --local user.email "johnroach1985@gmail.com"
-- git tag "$(./cartridgemapper version)-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h-1)"
+- git tag "$(./cartridgemapper version)-$(date +'%Y%m%d%H%M%S')"
 deploy:
   provider: releases
   api_key:
