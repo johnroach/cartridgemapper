@@ -1,6 +1,5 @@
 language: go
-script: go get github.com/JohnRoach/cartridgemapper && go test && go test ./cmd -test.v
-  && go build
+script: go get github.com/JohnRoach/cartridgemapper && go test && go test ./cmd -test.v && go build
 skip_cleanup: true
 before_deploy:
 - git config --local user.name "John Roach"
