@@ -9,7 +9,7 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure: $GITHUB-API-KEY
+    secure: ${GITHUB-API-KEY}
   file: cartridgemapper
   on:
     repo: JohnRoach/cartridgemapper
