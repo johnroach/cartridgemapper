@@ -86,7 +86,7 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version number of cartridgemapper",
 	Long:  `All software has versions. This is cartridgemappers's`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Cartridge mapper v" + printVersion())
+		fmt.Println(printVersion())
 	},
 }
 

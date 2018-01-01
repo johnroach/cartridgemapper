@@ -1,4 +1,17 @@
 language: go
 script: go get github.com/JohnRoach/cartridgemapper && go test && go test ./cmd -test.v
+  && go build
+skip_cleanup: true
+before_deploy:
+- git config --local user.name "John Roach"
+- git config --local user.email "johnroach1985@gmail.com"
+- git tag "$(./cartridgemapper version)-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h-1)"
+deploy:
+  provider: releases
+  api_key:
+    secure: $GITHUB
+  file: cartridgemapper
+  on:
+    repo: JohnRoach/cartridgemapper
 go:
-  - 1.9.x
+- 1.9.x
