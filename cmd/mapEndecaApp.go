@@ -3,9 +3,9 @@ package cmd
 import (
 	"os"
 
-	"github.com/JohnRoach/cartridgemapper/endeca"
-	"github.com/JohnRoach/cartridgemapper/templates"
-	"github.com/JohnRoach/cartridgemapper/utils"
+	"../endeca"
+	"../templates"
+	"../utils"
 	"github.com/spf13/cobra"
 )
 
