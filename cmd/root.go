@@ -21,6 +21,9 @@ var Debug bool
 // DisableColor disables the color for a given run
 var DisableColor bool
 
+//TAFPath is the path to the tools and framework
+var TAFPath string
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cartridgemapper",
@@ -48,11 +51,16 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(testConfigCmd)
 
 	// Persistent flags. Flags that will live for all subcommands.
+
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cartridgemapper.yaml)")
 	rootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "", false, "adding debug to the logging")
 	rootCmd.PersistentFlags().BoolVarP(&DisableColor, "disable-color", "", false, "disable color for logging output")
+	rootCmd.PersistentFlags().StringVarP(&TAFPath, "TAFPath", "", "", "TAF path")
+	viper.BindPFlag("TAFPath", rootCmd.PersistentFlags().Lookup("TAFPath"))
+
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -87,6 +95,15 @@ var versionCmd = &cobra.Command{
 	Long:  `All software has versions. This is cartridgemappers's`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(printVersion())
+	},
+}
+
+var testConfigCmd = &cobra.Command{
+	Use:   "testConfig",
+	Short: "test config",
+	Long:  `All software has versions. This is cartridgemappers's`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println(viper.GetString("TAFPath"))
 	},
 }
 
