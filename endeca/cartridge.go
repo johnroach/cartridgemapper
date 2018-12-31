@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/JohnRoach/cartridgemapper/utils"
+	"github.com/johnroach/cartridgemapper/utils"
 	"github.com/magiconair/properties"
 )
 

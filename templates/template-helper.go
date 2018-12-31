@@ -4,8 +4,8 @@ import (
 	"html/template"
 	"os"
 
-	"github.com/JohnRoach/cartridgemapper/endeca"
-	"github.com/JohnRoach/cartridgemapper/utils"
+	"github.com/johnroach/cartridgemapper/endeca"
+	"github.com/johnroach/cartridgemapper/utils"
 )
 
 //CartridgeOutputHTML receives the cartridges and by using the IndexPage template

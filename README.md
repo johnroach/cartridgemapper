@@ -1,6 +1,9 @@
 # Endeca Cartridge Mapper
 
-[![Build Status](https://travis-ci.org/JohnRoach/cartridgemapper.svg?branch=master)](https://travis-ci.org/JohnRoach/cartridgemapper)
+Want me to work on this more? Need coffee to convert to code [![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/K3K0MJBW)
+
+
+[![Build Status](https://travis-ci.org/johnroach/cartridgemapper.svg?branch=master)](https://travis-ci.org/johnroach/cartridgemapper)
 
 This cool tool scans a given Endeca Application an generates documentation regarding the cartridges in HTML or JSON form.
 
