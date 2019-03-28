@@ -1,47 +1,16 @@
-# Endeca Cartridge Mapper
+# cartridgemapper
 
-Want me to work on this more? Need coffee to convert to code [![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/K3K0MJBW)
+## Sub Packages
 
+* [cmd](./cmd)
 
-[![Build Status](https://travis-ci.org/johnroach/cartridgemapper.svg?branch=master)](https://travis-ci.org/johnroach/cartridgemapper)
+* [endeca](./endeca)
 
-This cool tool scans a given Endeca Application an generates documentation regarding the cartridges in HTML or JSON form.
+* [templates](./templates)
 
-The documentation includes information such as:
-- Name of cartridge
-- ID of cartridge
-- Description of cartridge
-- Endeca rules that use cartridge
-- Sites that use cartridge
-- Pages that use said cartridge
+* [utils](./utils)
 
 
-Sample run:
+---
 
-```
-$ ./cartridgemapper
-Endeca cartridge mapper maps the Endeca application cartridge usage.
-This is very useful in understanding how cartridges are used and which cartridges
-are available. One would use this tool to point to a given Endeca application and
-get an ouput of a certain format.
-
-For example:
-    cartridgemapp mapEndecaApp /full/path/to/endeca/App/lication
-    cartridgemapp mapEndecaApp /full/path/to/endeca/App/lication --output json
-
-Usage:
-  cartridgemapper [command]
-
-Available Commands:
-  help         Help about any command
-  mapEndecaApp mapEndecaApp maps the Endeca cartridges used in an Endeca Application
-  version      Print the version number of cartridgemapper
-
-Flags:
-      --config string   config file (default is $HOME/.cartridgemapper.yaml)
-      --debug           adding debug to the logging
-      --disable-color   disable color for logging output
-  -h, --help            help for cartridgemapper
-
-Use "cartridgemapper [command] --help" for more information about a command.
-```
+Created by [goreadme](https://github.com/apps/goreadme)
